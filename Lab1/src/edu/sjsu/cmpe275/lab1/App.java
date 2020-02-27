@@ -19,11 +19,20 @@ public class App {
         	//tweeter.tweet("Charlie", "AMy second tweet");
         	tweeter.tweet("WAlice", "Hello");
         	tweeter.tweet("Bob", "Hello");
+        	
+        	//tweeter.block("Bob", "Alice");
+        	tweeter.block("Charlie", "Bob");
+        	tweeter.block("Bob", "Charlie");
+        	
+        	tweeter.tweet("WAlice", "Hello");
+        	tweeter.tweet("Bob", "Hello");
         	     	
         	System.out.println(stats.getLengthOfLongestTweet());
         	System.out.println(stats.getMostFollowedUser());
         	System.out.println(stats.getMostPopularMessage());
         	System.out.println(stats.getMostProductiveUser());
+        	System.out.println(stats.getMostBlockedFollowerByNumberOfFollowees());
+        	System.out.println(stats.getMostBlockedFollowerByNumberOfMissedMessages());
         } catch (Exception e) {
             e.printStackTrace();
         }

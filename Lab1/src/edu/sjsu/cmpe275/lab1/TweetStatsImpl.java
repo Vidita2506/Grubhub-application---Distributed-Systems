@@ -15,12 +15,21 @@ public class TweetStatsImpl implements TweetStats {
 
 	public static Map<String, Integer> userTweetLengthMap = new HashMap<String, Integer>();
 	
+	public static Map<String, List<String>> blockerUsersMap = new HashMap<String, List<String>>();
+	
+	public static Map<String, List<String>> userBockedMap = new HashMap<String, List<String>>();
+	
+	public static Map<String, Integer> blockedUserByMessages = new HashMap<String, Integer>();
+	
 	@Override
 	public void resetStatsandSystem() {
 		lengthOfLargestTweet = 0;
 		followersMap = new HashMap<>();
 		messageFollowerCountMap = new HashMap<>();
 		userTweetLengthMap = new HashMap<>();
+		blockerUsersMap = new HashMap<>();
+		blockedUserByMessages = new HashMap<>();
+		userBockedMap = new HashMap<>();
 	}
 
 	@Override
@@ -81,7 +90,7 @@ public class TweetStatsImpl implements TweetStats {
 				mostProductiveUser = user;
 				maxTotalTweetLength = tweetLength;
 			} else if (tweetLength == maxTotalTweetLength) {
-				if (user.compareToIgnoreCase(mostProductiveUser) < 0) {
+				if (mostProductiveUser == null || user.compareToIgnoreCase(mostProductiveUser) < 0) {
 					mostProductiveUser = user;
 					maxTotalTweetLength = tweetLength;
 				}
@@ -92,14 +101,42 @@ public class TweetStatsImpl implements TweetStats {
 
 	@Override
 	public String getMostBlockedFollowerByNumberOfMissedMessages() {
-		// TODO Auto-generated method stub
-		return null;
+		int maxBlockedMessagesCount = 0;
+		String mostBlockedUserByMissedMsg = null;
+		for (Entry<String, Integer> entry : blockedUserByMessages.entrySet()) {
+			String user = entry.getKey();
+			int blockedMsgCount = entry.getValue();
+			if (blockedMsgCount > maxBlockedMessagesCount) {
+				mostBlockedUserByMissedMsg = user;
+				maxBlockedMessagesCount = blockedMsgCount;
+			} else if (blockedMsgCount == maxBlockedMessagesCount) {
+				if (mostBlockedUserByMissedMsg == null || user.compareToIgnoreCase(mostBlockedUserByMissedMsg) < 0) {
+					mostBlockedUserByMissedMsg = user;
+					maxBlockedMessagesCount = blockedMsgCount;
+				}
+			}
+		}
+		return mostBlockedUserByMissedMsg;
 	}
 
 	@Override
 	public String getMostBlockedFollowerByNumberOfFollowees() {
-		// TODO Auto-generated method stub
-		return null;
+		int maxBlockedByCount = 0;
+		String mostBlockedUser = null;
+		for (Entry<String, List<String>> entry : blockerUsersMap.entrySet()) {
+			String blockedUser = entry.getKey();
+			int blockedByCount = entry.getValue().size();
+			if (blockedByCount > maxBlockedByCount) {
+				mostBlockedUser = blockedUser;
+				maxBlockedByCount = blockedByCount;
+			} else if (blockedByCount == maxBlockedByCount) {
+				if (mostBlockedUser == null || blockedUser.compareToIgnoreCase(mostBlockedUser) < 0) {
+					mostBlockedUser = blockedUser;
+					maxBlockedByCount = blockedByCount;
+				}
+			}
+		}
+		return mostBlockedUser;
 	}
 
 }
