@@ -5,12 +5,13 @@ import java.io.IOException;
 public class TweetServiceImpl implements TweetService {
 	
 
-	public static int counter = 0;
+	public static int counter = 3;
 
 	@Override
 	public void tweet(String user, String message) throws IllegalArgumentException, IOException {
-		
-		if(counter-- > 0) throw new IOException();
+		if(counter-- > 0) {
+			throw new IOException();
+		}
 		if(message == null || message.isEmpty() || message.length()>140 || user == null || user.isEmpty()) {
 			throw new IllegalArgumentException();
 		}

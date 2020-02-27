@@ -24,6 +24,6 @@
     <bean id="tweetService" class="edu.sjsu.cmpe275.lab1.TweetServiceImpl" scope="singleton"/>
     <bean id="tweetStats" class="edu.sjsu.cmpe275.lab1.TweetStatsImpl" scope="singleton"/>
 
-   <!--  <bean name="retryAspect" class="edu.sjsu.cmpe275.lab1.aspect.RetryAspect" scope="singleton"/>  -->
+    <bean name="retryAspect" class="edu.sjsu.cmpe275.lab1.aspect.RetryAspect" scope="singleton"/>
     <bean name="statsAspect" class="edu.sjsu.cmpe275.lab1.aspect.StatsAspect" scope="singleton"/>
 </beans>
