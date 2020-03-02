@@ -5,18 +5,10 @@ import java.io.IOException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import edu.sjsu.cmpe275.lab1.TweetStatsImpl;
 
 @Aspect
 public class RetryAspect {
-
-	@Autowired
-	private TweetStatsImpl stats;
-
 	boolean flag = true;
-	boolean retrycompleted = false;
 
 	@Around("execution(public void edu.sjsu.cmpe275.lab1.TweetService.tweet(..))")
 	public void retry(ProceedingJoinPoint joinPoint) throws Throwable {

@@ -5,7 +5,7 @@ import java.io.IOException;
 public class TweetServiceImpl implements TweetService {
 	
 
-	public static int counter = 3;
+	public static int counter = 5;
 
 	@Override
 	public void tweet(String user, String message) throws IllegalArgumentException, IOException {
