@@ -1,6 +1,6 @@
 package edu.sjsu.cmpe275.aop.tweet.aspect;
 
-import java.util.List;
+import java.util.Set;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -64,7 +64,7 @@ public class ValidationAspect {
 		if (user.equals(follower)) {
 			throw new UnsupportedOperationException("You cannot unblock yourself");
 		} 
-		if ( isListEmpty(stats.getUserBlockedFollowersListMap().get(user))
+		if ( isSetEmpty(stats.getUserBlockedFollowersListMap().get(user))
 			|| (!stats.getUserBlockedFollowersListMap().get(user).contains(follower))) {
 			throw new UnsupportedOperationException("This user is not blocked");
 		}
@@ -78,7 +78,7 @@ public class ValidationAspect {
 		}	
 	}
 	
-	private boolean isListEmpty(List<String> data) {
+	private boolean isSetEmpty(Set<String> data) {
 		if (data == null || data.isEmpty()) {
 			return true;
 		} else {

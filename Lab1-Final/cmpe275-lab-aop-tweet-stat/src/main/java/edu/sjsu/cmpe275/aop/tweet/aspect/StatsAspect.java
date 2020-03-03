@@ -1,9 +1,8 @@
 package edu.sjsu.cmpe275.aop.tweet.aspect;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -51,12 +50,10 @@ public class StatsAspect {
 		   followers list to add new follower, else create a new list
 		*/
 		if (stats.getUserFollowersListMap().containsKey(followee)) {
-			List<String> currentFollowers = stats.getUserFollowersListMap().get(followee);
-			if (!currentFollowers.contains(follower)) {
-				currentFollowers.add(follower);
-			}
+			Set<String> currentFollowers = stats.getUserFollowersListMap().get(followee);
+		    currentFollowers.add(follower);
 		} else {
-			List<String> followers = new ArrayList<String>();
+			Set<String> followers = new HashSet<String>();
 			followers.add(follower);
 			stats.getUserFollowersListMap().put(followee, followers);
 		}
@@ -68,21 +65,21 @@ public class StatsAspect {
 		String blockedFollower = (String) joinPoint.getArgs()[1];
 
 		if (stats.getUserBlockedFollowersListMap().containsKey(user)) {
-			List<String> blockedFollowersList = stats.getUserBlockedFollowersListMap().get(user);
-			if (!blockedFollowersList.contains(blockedFollower)) {
-				blockedFollowersList.add(blockedFollower);
-			}
+			Set<String> blockedFollowersList = stats.getUserBlockedFollowersListMap().get(user);
+			blockedFollowersList.add(blockedFollower);
 		} else {
-			stats.getUserBlockedFollowersListMap().put(user, new ArrayList<String>(Arrays.asList(blockedFollower)));
+			Set<String> newFollowersSet = new HashSet<String>();
+			newFollowersSet.add(blockedFollower);
+			stats.getUserBlockedFollowersListMap().put(user, newFollowersSet);
 		}
 
 		if (stats.getBlockedUserFolloweesMap().containsKey(blockedFollower)) {
-			List<String> followeesList = stats.getBlockedUserFolloweesMap().get(blockedFollower);
-			if (!followeesList.contains(user)) {
-				followeesList.add(user);
-			}
+			Set<String> followeesList = stats.getBlockedUserFolloweesMap().get(blockedFollower);
+		    followeesList.add(user);
 		} else {
-			stats.getBlockedUserFolloweesMap().put(blockedFollower, new ArrayList<String>(Arrays.asList(user)));
+			Set<String> newUserSet = new HashSet<String>();
+			newUserSet.add(user);
+			stats.getBlockedUserFolloweesMap().put(blockedFollower, newUserSet);
 		}
 	}
 
@@ -91,21 +88,17 @@ public class StatsAspect {
 		String user = (String) joinPoint.getArgs()[0];
 		String unBlockedFollower = (String) joinPoint.getArgs()[1];
 		if (stats.getUserBlockedFollowersListMap().containsKey(user)) {
-			List<String> blockedFollowersList = stats.getUserBlockedFollowersListMap().get(user);
-			if (blockedFollowersList.contains(unBlockedFollower)) {
-				blockedFollowersList.remove(unBlockedFollower);
-			}
+			Set<String> blockedFollowersList = stats.getUserBlockedFollowersListMap().get(user);
+			blockedFollowersList.remove(unBlockedFollower);
 		}
 
 		if (stats.getBlockedUserFolloweesMap().containsKey(unBlockedFollower)) {
-			List<String> followeesList = stats.getBlockedUserFolloweesMap().get(unBlockedFollower);
-			if (followeesList.contains(user)) {
-				followeesList.remove(user);
-			}
+			Set<String> followeesList = stats.getBlockedUserFolloweesMap().get(unBlockedFollower);
+			followeesList.remove(user);
 		}
 	}
 
-	private boolean isListEmpty(List<String> data) {
+	private boolean isSetEmpty(Set<String> data) {
 		if (data == null || data.isEmpty()) {
 			return true;
 		} else {
@@ -123,8 +116,8 @@ public class StatsAspect {
 	}
 
 	private void setBlockedUserByMissedMsgCount(String user) {
-		List<String> blockedUsers = stats.getUserBlockedFollowersListMap().get(user);
-		if (isListEmpty(blockedUsers)) {
+		Set<String> blockedUsers = stats.getUserBlockedFollowersListMap().get(user);
+		if (isSetEmpty(blockedUsers)) {
 			return;
 		}
 		Map<String, Integer> blockedUserByMissedMsgCount = stats.getBlockedUserByMissedMessageCount();
@@ -139,23 +132,21 @@ public class StatsAspect {
 	}
 
 	private void setMessageFollowersStats(String user, String msg) {
-		List<String> currentUserFollowers = stats.getUserFollowersListMap().get(user);
-		if (isListEmpty(currentUserFollowers)) {
+		Set<String> currentUserFollowers = stats.getUserFollowersListMap().get(user);
+		if (isSetEmpty(currentUserFollowers)) {
 			return;
 		}
-		List<String> getUnblockedFollowers = getUnblockedFollowers(user, currentUserFollowers);
-		if (isListEmpty(getUnblockedFollowers)) {
+		Set<String> unblockedFollowers = getUnblockedFollowers(user, currentUserFollowers);
+		if (isSetEmpty(unblockedFollowers)) {
 			return;
 		}
-		List<String> currentMsgFollowers = stats.getMessageFollowersListMap().get(msg);
-		if (!isListEmpty(currentMsgFollowers)) {
-			for (String userFollower : getUnblockedFollowers) {
-				if (!currentMsgFollowers.contains(userFollower)) {
-					currentMsgFollowers.add(userFollower);
-				}
+		Set<String> currentMsgFollowers = stats.getMessageFollowersListMap().get(msg);
+		if (!isSetEmpty(currentMsgFollowers)) {
+			for (String userFollower : unblockedFollowers) {
+				currentMsgFollowers.add(userFollower);
 			}
 		} else {
-			stats.getMessageFollowersListMap().put(msg, getUnblockedFollowers);
+			stats.getMessageFollowersListMap().put(msg, unblockedFollowers);
 		}
 	}
 
@@ -166,11 +157,11 @@ public class StatsAspect {
 		}
 	}
 
-	private List<String> getUnblockedFollowers(String user, List<String> currentUserFollowers) {
-		List<String> unblockedFollowers = new ArrayList<>();
+	private Set<String> getUnblockedFollowers(String user, Set<String> currentUserFollowers) {
+		Set<String> unblockedFollowers = new HashSet<>();
 		unblockedFollowers.addAll(currentUserFollowers);
-		List<String> blockedUsers = stats.getUserBlockedFollowersListMap().get(user);
-		if (!isListEmpty(blockedUsers)) {
+		Set<String> blockedUsers = stats.getUserBlockedFollowersListMap().get(user);
+		if (!isSetEmpty(blockedUsers)) {
 			for (String blockedUser : blockedUsers) {
 				unblockedFollowers.remove(blockedUser);
 			}

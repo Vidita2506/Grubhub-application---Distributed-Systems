@@ -1,25 +1,25 @@
 package edu.sjsu.cmpe275.aop.tweet;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class TweetStatsServiceImpl implements TweetStatsService {
    
 	public int lengthOfLargestTweet = 0;
 
-	// key=>User, value=>followers list for the user
-	private Map<String, List<String>> userFollowersListMap = new HashMap<>();
+	// key=>User, value=>followers for the user
+	private Map<String, Set<String>> userFollowersSetMap = new HashMap<>();
 	
-	// key=>user, value=>followers list that are blocked
-	private Map<String, List<String>> userBlockedFollowersListMap = new HashMap<>();
+	// key=>user, value=>followers that are blocked
+	private Map<String, Set<String>> userBlockedFollowersSetMap = new HashMap<>();
 	
-	// key=>Blocked User, value=> List of users who blocked the user
-	private Map<String, List<String>> blockedUserFolloweesMap = new HashMap<>();
+	// key=>Blocked User, value=> Set of users who blocked the user
+	private Map<String, Set<String>> blockedUserFolloweesMap = new HashMap<>();
 	
-	// key=>message, value=>followers list for the message
-	private Map<String, List<String>> messageFollowersListMap = new HashMap<>();
+	// key=>message, value=>followers for the message
+	private Map<String, Set<String>> messageFollowersSetMap = new HashMap<>();
 	
 	// key=>user, value=> The total length of all tweets shared by the user
 	private Map<String, Integer> userTotalTweetsLengthMap = new HashMap<String, Integer>();
@@ -30,10 +30,10 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 	@Override
 	public void resetStatsAndSystem() {
 		lengthOfLargestTweet = 0;
-		userFollowersListMap = new HashMap<>();
-		userBlockedFollowersListMap = new HashMap<>();
+		userFollowersSetMap = new HashMap<>();
+		userBlockedFollowersSetMap = new HashMap<>();
 		blockedUserFolloweesMap = new HashMap<>();
-		messageFollowersListMap = new HashMap<>();
+		messageFollowersSetMap = new HashMap<>();
 		userTotalTweetsLengthMap = new HashMap<>();
 		blockedUserByMissedMessageCount = new HashMap<>();
 	}
@@ -47,7 +47,7 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 	public String getMostFollowedUser() {
 		int maxFollowersCount = 0;
 		String mostFollowedUser = null;
-		for (Entry<String, List<String>> entry : userFollowersListMap.entrySet()) {
+		for (Entry<String, Set<String>> entry : userFollowersSetMap.entrySet()) {
 			String followee = entry.getKey();
 			int numberOfFollowers = entry.getValue().size();
 			if (numberOfFollowers > maxFollowersCount) {
@@ -67,7 +67,7 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 	public String getMostPopularMessage() {
 		int maxFollowedMsgCount = 0;
 		String mostPopularMsg = null;
-		for (Entry<String, List<String>> entry : messageFollowersListMap.entrySet()) {
+		for (Entry<String, Set<String>> entry : messageFollowersSetMap.entrySet()) {
 			String message = entry.getKey();
 			int numberOfMsgFollowers = entry.getValue().size();
 			if (numberOfMsgFollowers > maxFollowedMsgCount) {
@@ -127,7 +127,7 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 	public String getMostBlockedFollowerByNumberOfFollowees() {
 		int maxBlockedByFolloweesCount = 0;
 		String mostBlockedFollower = null;
-		for (Entry<String, List<String>> entry : blockedUserFolloweesMap.entrySet()) {
+		for (Entry<String, Set<String>> entry : blockedUserFolloweesMap.entrySet()) {
 			String blockedFollower = entry.getKey();
 			int numberOfBlockedByFollowees = entry.getValue().size();
 			if (numberOfBlockedByFollowees > maxBlockedByFolloweesCount) {
@@ -147,20 +147,20 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 		return lengthOfLargestTweet;
 	}
 
-	public Map<String, List<String>> getUserFollowersListMap() {
-		return userFollowersListMap;
+	public Map<String, Set<String>> getUserFollowersListMap() {
+		return userFollowersSetMap;
 	}
 
-	public Map<String, List<String>> getUserBlockedFollowersListMap() {
-		return userBlockedFollowersListMap;
+	public Map<String, Set<String>> getUserBlockedFollowersListMap() {
+		return userBlockedFollowersSetMap;
 	}
 
-	public Map<String, List<String>> getBlockedUserFolloweesMap() {
+	public Map<String, Set<String>> getBlockedUserFolloweesMap() {
 		return blockedUserFolloweesMap;
 	}
 
-	public Map<String, List<String>> getMessageFollowersListMap() {
-		return messageFollowersListMap;
+	public Map<String, Set<String>> getMessageFollowersListMap() {
+		return messageFollowersSetMap;
 	}
 
 	public Map<String, Integer> getUserTotalTweetsLengthMap() {
