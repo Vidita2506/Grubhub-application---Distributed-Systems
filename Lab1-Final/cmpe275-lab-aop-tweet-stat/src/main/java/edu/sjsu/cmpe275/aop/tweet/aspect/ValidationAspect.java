@@ -12,6 +12,10 @@ import edu.sjsu.cmpe275.aop.tweet.TweetStatsServiceImpl;
 
 @Aspect
 @Order(2)
+
+/**
+ * Aspect for validating the user input for all tweet methods
+ */
 public class ValidationAspect {
 	
 	@Autowired
@@ -32,7 +36,8 @@ public class ValidationAspect {
 		String followee = (String) joinPoint.getArgs()[1];
 		if (isEmptyString(follower) || isEmptyString(followee)) {
 			throw new IllegalArgumentException("Ivalid arguments");
-		} else if (followee.equals(follower)) {
+		}
+		if (followee.equals(follower)) {
 			throw new UnsupportedOperationException("You cannot follow yourself");
 		}
 	}
@@ -43,7 +48,8 @@ public class ValidationAspect {
 		String follower = (String) joinPoint.getArgs()[1];
 		if (isEmptyString(user) || isEmptyString(follower)) {
 			throw new IllegalArgumentException("Ivalid arguments");
-		} else if (user.equals(follower)) {
+		}
+		if (user.equals(follower)) {
 			throw new UnsupportedOperationException("You cannot block yourself");
 		}
 	}
@@ -54,11 +60,12 @@ public class ValidationAspect {
 		String follower = (String) joinPoint.getArgs()[1];
 		if (isEmptyString(user) || isEmptyString(follower)) {
 			throw new IllegalArgumentException("Ivalid arguments");
-		} else if (user.equals(follower)) {
+		} 
+		if (user.equals(follower)) {
 			throw new UnsupportedOperationException("You cannot unblock yourself");
-		} else if ( isListEmpty(stats.getUserBlockedFollowersListMap().get(user))
+		} 
+		if ( isListEmpty(stats.getUserBlockedFollowersListMap().get(user))
 			|| (!stats.getUserBlockedFollowersListMap().get(user).contains(follower))) {
-			
 			throw new UnsupportedOperationException("This user is not blocked");
 		}
 	}

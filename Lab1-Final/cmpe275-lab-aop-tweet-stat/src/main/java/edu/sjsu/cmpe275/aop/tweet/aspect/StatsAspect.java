@@ -15,6 +15,10 @@ import edu.sjsu.cmpe275.aop.tweet.TweetStatsServiceImpl;
 
 @Aspect
 @Order(0)
+
+/**
+ * Aspect to record stats after successful tweet operations
+ */
 public class StatsAspect {
 	@Autowired
 	TweetStatsServiceImpl stats;
@@ -37,6 +41,78 @@ public class StatsAspect {
 		setTotalTweetLengthForUser(user, msg);
 	}
 
+	
+	@AfterReturning("execution(public void edu.sjsu.cmpe275.aop.tweet.TweetService.follow(..))")
+	public void afterSuccessFullFollow(JoinPoint joinPoint) {
+		String follower = (String) joinPoint.getArgs()[0];
+		String followee = (String) joinPoint.getArgs()[1];
+		
+		/* If the followee already has at least one follower, modify the existing 
+		   followers list to add new follower, else create a new list
+		*/
+		if (stats.getUserFollowersListMap().containsKey(followee)) {
+			List<String> currentFollowers = stats.getUserFollowersListMap().get(followee);
+			if (!currentFollowers.contains(follower)) {
+				currentFollowers.add(follower);
+			}
+		} else {
+			List<String> followers = new ArrayList<String>();
+			followers.add(follower);
+			stats.getUserFollowersListMap().put(followee, followers);
+		}
+	}
+
+	@AfterReturning("execution(public void edu.sjsu.cmpe275.aop.tweet.TweetService.block(..))")
+	public void afterSuccessFullBlock(JoinPoint joinPoint) {
+		String user = (String) joinPoint.getArgs()[0];
+		String blockedFollower = (String) joinPoint.getArgs()[1];
+
+		if (stats.getUserBlockedFollowersListMap().containsKey(user)) {
+			List<String> blockedFollowersList = stats.getUserBlockedFollowersListMap().get(user);
+			if (!blockedFollowersList.contains(blockedFollower)) {
+				blockedFollowersList.add(blockedFollower);
+			}
+		} else {
+			stats.getUserBlockedFollowersListMap().put(user, new ArrayList<String>(Arrays.asList(blockedFollower)));
+		}
+
+		if (stats.getBlockedUserFolloweesMap().containsKey(blockedFollower)) {
+			List<String> followeesList = stats.getBlockedUserFolloweesMap().get(blockedFollower);
+			if (!followeesList.contains(user)) {
+				followeesList.add(user);
+			}
+		} else {
+			stats.getBlockedUserFolloweesMap().put(blockedFollower, new ArrayList<String>(Arrays.asList(user)));
+		}
+	}
+
+	@AfterReturning("execution(public void edu.sjsu.cmpe275.aop.tweet.TweetService.unblock(..))")
+	public void afterSuccessFullUnblock(JoinPoint joinPoint) {
+		String user = (String) joinPoint.getArgs()[0];
+		String unBlockedFollower = (String) joinPoint.getArgs()[1];
+		if (stats.getUserBlockedFollowersListMap().containsKey(user)) {
+			List<String> blockedFollowersList = stats.getUserBlockedFollowersListMap().get(user);
+			if (blockedFollowersList.contains(unBlockedFollower)) {
+				blockedFollowersList.remove(unBlockedFollower);
+			}
+		}
+
+		if (stats.getBlockedUserFolloweesMap().containsKey(unBlockedFollower)) {
+			List<String> followeesList = stats.getBlockedUserFolloweesMap().get(unBlockedFollower);
+			if (followeesList.contains(user)) {
+				followeesList.remove(user);
+			}
+		}
+	}
+
+	private boolean isListEmpty(List<String> data) {
+		if (data == null || data.isEmpty()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	private void setTotalTweetLengthForUser(String user, String msg) {
 		Integer currentTotalLength = stats.getUserTotalTweetsLengthMap().get(user);
 		if (currentTotalLength == null) {
@@ -100,72 +176,5 @@ public class StatsAspect {
 			}
 		}
 		return unblockedFollowers;
-	}
-
-	@AfterReturning("execution(public void edu.sjsu.cmpe275.aop.tweet.TweetService.follow(..))")
-	public void afterSuccessFullFollow(JoinPoint joinPoint) {
-		String follower = (String) joinPoint.getArgs()[0];
-		String followee = (String) joinPoint.getArgs()[1];
-		if (stats.getUserFollowersListMap().containsKey(followee)) {
-			List<String> currentFollowers = stats.getUserFollowersListMap().get(followee);
-			if (!currentFollowers.contains(follower)) {
-				currentFollowers.add(follower);
-			}
-		} else {
-			List<String> followers = new ArrayList<String>();
-			followers.add(follower);
-			stats.getUserFollowersListMap().put(followee, followers);
-		}
-	}
-
-	@AfterReturning("execution(public void edu.sjsu.cmpe275.aop.tweet.TweetService.block(..))")
-	public void afterSuccessFullBlock(JoinPoint joinPoint) {
-		String user = (String) joinPoint.getArgs()[0];
-		String blockedFollower = (String) joinPoint.getArgs()[1];
-
-		if (stats.getUserBlockedFollowersListMap().containsKey(user)) {
-			List<String> blockedFollowersList = stats.getUserBlockedFollowersListMap().get(user);
-			if (!blockedFollowersList.contains(blockedFollower)) {
-				blockedFollowersList.add(blockedFollower);
-			}
-		} else {
-			stats.getUserBlockedFollowersListMap().put(user, new ArrayList<String>(Arrays.asList(blockedFollower)));
-		}
-
-		if (stats.getBlockedUserFolloweesMap().containsKey(blockedFollower)) {
-			List<String> followeesList = stats.getBlockedUserFolloweesMap().get(blockedFollower);
-			if (!followeesList.contains(user)) {
-				followeesList.add(user);
-			}
-		} else {
-			stats.getBlockedUserFolloweesMap().put(blockedFollower, new ArrayList<String>(Arrays.asList(user)));
-		}
-	}
-
-	@AfterReturning("execution(public void edu.sjsu.cmpe275.aop.tweet.TweetService.unblock(..))")
-	public void afterSuccessFullUnblock(JoinPoint joinPoint) {
-		String user = (String) joinPoint.getArgs()[0];
-		String unBlockedFollower = (String) joinPoint.getArgs()[1];
-		if (stats.getUserBlockedFollowersListMap().containsKey(user)) {
-			List<String> blockedFollowersList = stats.getUserBlockedFollowersListMap().get(user);
-			if (blockedFollowersList.contains(unBlockedFollower)) {
-				blockedFollowersList.remove(unBlockedFollower);
-			}
-		}
-
-		if (stats.getBlockedUserFolloweesMap().containsKey(unBlockedFollower)) {
-			List<String> followeesList = stats.getBlockedUserFolloweesMap().get(unBlockedFollower);
-			if (followeesList.contains(user)) {
-				followeesList.remove(user);
-			}
-		}
-	}
-
-	private boolean isListEmpty(List<String> data) {
-		if (data == null || data.isEmpty()) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 }

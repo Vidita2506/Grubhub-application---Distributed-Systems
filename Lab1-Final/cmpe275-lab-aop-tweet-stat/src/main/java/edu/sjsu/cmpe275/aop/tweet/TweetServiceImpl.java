@@ -26,6 +26,11 @@ public class TweetServiceImpl implements TweetService {
 			counter --;
 			throw new IOException();
 		}
+		
+		if ("Carl".equals(follower)) {
+			throw new IOException();
+		}
+		
        	System.out.printf("User %s followed user %s \n", follower, followee);
     }
 

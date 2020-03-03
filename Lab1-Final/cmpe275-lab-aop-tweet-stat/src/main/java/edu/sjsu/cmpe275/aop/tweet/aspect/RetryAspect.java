@@ -9,6 +9,10 @@ import org.aspectj.lang.annotation.Around;
 
 @Aspect
 @Order(1)
+
+/**
+ * Aspect to retry the tweet operations that fail due to N/W errors
+ */
 public class RetryAspect {
 
 	@Around("execution(public void edu.sjsu.cmpe275.aop.tweet.TweetService.*(..))")

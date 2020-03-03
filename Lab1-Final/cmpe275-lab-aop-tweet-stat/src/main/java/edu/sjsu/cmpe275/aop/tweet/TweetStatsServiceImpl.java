@@ -9,19 +9,19 @@ public class TweetStatsServiceImpl implements TweetStatsService {
    
 	public int lengthOfLargestTweet = 0;
 
-	// key=>User, value=>followers list
+	// key=>User, value=>followers list for the user
 	private Map<String, List<String>> userFollowersListMap = new HashMap<>();
 	
-	// key=>user, value=>blocked followers list
+	// key=>user, value=>followers list that are blocked
 	private Map<String, List<String>> userBlockedFollowersListMap = new HashMap<>();
 	
-	// key=>Blocked User, value=> List of users who blocked this user
+	// key=>Blocked User, value=> List of users who blocked the user
 	private Map<String, List<String>> blockedUserFolloweesMap = new HashMap<>();
 	
-	// key=>message, value=>followers list
+	// key=>message, value=>followers list for the message
 	private Map<String, List<String>> messageFollowersListMap = new HashMap<>();
 	
-	// key=>user, value=> The total length of all tweets
+	// key=>user, value=> The total length of all tweets shared by the user
 	private Map<String, Integer> userTotalTweetsLengthMap = new HashMap<String, Integer>();
 	
 	// key=>blocked user, value=> Missed messages count
@@ -53,7 +53,7 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 			if (numberOfFollowers > maxFollowersCount) {
 				mostFollowedUser = followee;
 				maxFollowersCount = numberOfFollowers;
-			} else if (numberOfFollowers == maxFollowersCount) {
+			} else if (numberOfFollowers != 0 && (numberOfFollowers == maxFollowersCount)) {
 				if (mostFollowedUser == null || followee.compareToIgnoreCase(mostFollowedUser) < 0) {
 					mostFollowedUser = followee;
 					maxFollowersCount = numberOfFollowers;
@@ -73,7 +73,7 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 			if (numberOfMsgFollowers > maxFollowedMsgCount) {
 				mostPopularMsg = message;
 				maxFollowedMsgCount = numberOfMsgFollowers;
-			} else if (numberOfMsgFollowers == maxFollowedMsgCount) {
+			} else if (numberOfMsgFollowers != 0 && (numberOfMsgFollowers == maxFollowedMsgCount)) {
 				if (mostPopularMsg == null || message.compareToIgnoreCase(mostPopularMsg) < 0) {
 					mostPopularMsg = message;
 					maxFollowedMsgCount = numberOfMsgFollowers;
@@ -113,7 +113,7 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 			if (blockedMsgCount > maxMissedMessagesCount) {
 				mostBlockedUserByMissedMsg = blockedUser;
 				maxMissedMessagesCount = blockedMsgCount;
-			} else if (blockedMsgCount == maxMissedMessagesCount) {
+			} else if (blockedMsgCount !=0 && (blockedMsgCount == maxMissedMessagesCount)) {
 				if (mostBlockedUserByMissedMsg == null || blockedUser.compareToIgnoreCase(mostBlockedUserByMissedMsg) < 0) {
 					mostBlockedUserByMissedMsg = blockedUser;
 					maxMissedMessagesCount = blockedMsgCount;
@@ -133,7 +133,7 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 			if (numberOfBlockedByFollowees > maxBlockedByFolloweesCount) {
 				mostBlockedFollower = blockedFollower;
 				maxBlockedByFolloweesCount = numberOfBlockedByFollowees;
-			} else if (numberOfBlockedByFollowees == maxBlockedByFolloweesCount) {
+			} else if (numberOfBlockedByFollowees != 0 && (numberOfBlockedByFollowees == maxBlockedByFolloweesCount)) {
 				if (mostBlockedFollower == null || blockedFollower.compareToIgnoreCase(mostBlockedFollower) < 0) {
 					mostBlockedFollower = blockedFollower;
 					maxBlockedByFolloweesCount = numberOfBlockedByFollowees;
