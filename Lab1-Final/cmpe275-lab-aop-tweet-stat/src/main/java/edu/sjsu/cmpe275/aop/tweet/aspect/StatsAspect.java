@@ -75,7 +75,7 @@ public class StatsAspect {
 
 		if (stats.getBlockedUserFolloweesMap().containsKey(blockedFollower)) {
 			Set<String> followeesList = stats.getBlockedUserFolloweesMap().get(blockedFollower);
-		    followeesList.add(user);
+			followeesList.add(user);
 		} else {
 			Set<String> newUserSet = new HashSet<String>();
 			newUserSet.add(user);
@@ -158,7 +158,7 @@ public class StatsAspect {
 	}
 
 	private Set<String> getUnblockedFollowers(String user, Set<String> currentUserFollowers) {
-		Set<String> unblockedFollowers = new HashSet<>();
+		Set<String> unblockedFollowers = new HashSet<String>();
 		unblockedFollowers.addAll(currentUserFollowers);
 		Set<String> blockedUsers = stats.getUserBlockedFollowersListMap().get(user);
 		if (!isSetEmpty(blockedUsers)) {

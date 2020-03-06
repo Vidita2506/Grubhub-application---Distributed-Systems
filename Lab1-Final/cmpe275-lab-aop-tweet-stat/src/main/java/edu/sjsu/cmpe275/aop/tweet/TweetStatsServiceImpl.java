@@ -1,6 +1,7 @@
 package edu.sjsu.cmpe275.aop.tweet;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -10,16 +11,16 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 	public int lengthOfLargestTweet = 0;
 
 	// key=>User, value=>followers for the user
-	private Map<String, Set<String>> userFollowersSetMap = new HashMap<>();
+	private Map<String, Set<String>> userFollowersSetMap = new HashMap<String, Set<String>>();
 	
 	// key=>user, value=>followers that are blocked
-	private Map<String, Set<String>> userBlockedFollowersSetMap = new HashMap<>();
+	private Map<String, Set<String>> userBlockedFollowersSetMap = new HashMap<String, Set<String>>();
 	
 	// key=>Blocked User, value=> Set of users who blocked the user
-	private Map<String, Set<String>> blockedUserFolloweesMap = new HashMap<>();
+	private Map<String, Set<String>> blockedUserFolloweesMap = new HashMap<String, Set<String>>();
 	
 	// key=>message, value=>followers for the message
-	private Map<String, Set<String>> messageFollowersSetMap = new HashMap<>();
+	private Map<String, Set<String>> messageFollowersSetMap = new HashMap<String, Set<String>>();
 	
 	// key=>user, value=> The total length of all tweets shared by the user
 	private Map<String, Integer> userTotalTweetsLengthMap = new HashMap<String, Integer>();
@@ -30,12 +31,12 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 	@Override
 	public void resetStatsAndSystem() {
 		lengthOfLargestTweet = 0;
-		userFollowersSetMap = new HashMap<>();
-		userBlockedFollowersSetMap = new HashMap<>();
-		blockedUserFolloweesMap = new HashMap<>();
-		messageFollowersSetMap = new HashMap<>();
-		userTotalTweetsLengthMap = new HashMap<>();
-		blockedUserByMissedMessageCount = new HashMap<>();
+		userFollowersSetMap = new HashMap<String, Set<String>>();
+		userBlockedFollowersSetMap = new HashMap<String, Set<String>>();
+		blockedUserFolloweesMap = new HashMap<String, Set<String>>();
+		messageFollowersSetMap = new HashMap<String, Set<String>>();
+		userTotalTweetsLengthMap = new HashMap<String, Integer>();
+		blockedUserByMissedMessageCount = new HashMap<String, Integer>();
 	}
     
 	@Override
@@ -129,7 +130,18 @@ public class TweetStatsServiceImpl implements TweetStatsService {
 		String mostBlockedFollower = null;
 		for (Entry<String, Set<String>> entry : blockedUserFolloweesMap.entrySet()) {
 			String blockedFollower = entry.getKey();
-			int numberOfBlockedByFollowees = entry.getValue().size();
+			
+			Set<String> followees = entry.getValue();
+			Set<String> actualFollowees = new HashSet<String>();
+			for (String followee : followees) {
+				if (userFollowersSetMap.containsKey(followee)) {
+					if (userFollowersSetMap.get(followee).contains(blockedFollower)) {
+						actualFollowees.add(followee);
+					}
+				}
+			}
+			
+			int numberOfBlockedByFollowees = actualFollowees.size();
 			if (numberOfBlockedByFollowees > maxBlockedByFolloweesCount) {
 				mostBlockedFollower = blockedFollower;
 				maxBlockedByFolloweesCount = numberOfBlockedByFollowees;

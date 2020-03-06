@@ -340,6 +340,12 @@ public class TweetTest {
 		String mostBlockedFollower = stats.getMostBlockedFollowerByNumberOfFollowees();
 		Assert.assertEquals(null, mostBlockedFollower);
 
+		tweeter.follow("Bob", "Alice");
+		tweeter.follow("Bob", "John");
+		tweeter.follow("Charlie", "Mike");
+		tweeter.follow("Charlie", "Amy");
+		tweeter.follow("Charlie", "Andy");
+		
 		tweeter.block("Alice", "Bob");
 		tweeter.block("John", "Bob");
 		tweeter.block("Mike", "Charlie");
@@ -396,6 +402,10 @@ public class TweetTest {
 		
 		tweeter.block("James", "Zhang");
 		mostBlockedUserByFollowees = stats.getMostBlockedFollowerByNumberOfFollowees();
+		Assert.assertEquals(null, mostBlockedUserByFollowees);
+		
+		tweeter.follow("Zhang", "James");
+		mostBlockedUserByFollowees = stats.getMostBlockedFollowerByNumberOfFollowees();
 		Assert.assertEquals("Zhang", mostBlockedUserByFollowees);
 	}
 	
@@ -426,12 +436,18 @@ public class TweetTest {
 	
 	@Test
 	public void test4() throws IllegalArgumentException, IOException {
+		tweeter.follow("Bob", "Alice");
 		tweeter.block("Alice", "Bob");
 		tweeter.block("James", "Alice");
 		tweeter.block("Alice", "Bob");
 		tweeter.block("Alice", "Bob");
 		
 		String mostBlockedFollowerByFollowees = stats.getMostBlockedFollowerByNumberOfFollowees();
+		Assert.assertEquals("Bob", mostBlockedFollowerByFollowees);
+		
+		tweeter.follow("Alice", "James");
+		mostBlockedFollowerByFollowees = stats.getMostBlockedFollowerByNumberOfFollowees();
 		Assert.assertEquals("Alice", mostBlockedFollowerByFollowees);
+		
 	}
 }
